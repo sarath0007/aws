@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AWS Sandbox Innovation Credits</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --navy:    #0b1529;
+  --navy2:   #112240;
+  --navy3:   #1a3356;
+  --aws:     #FF9900;
+  --aws-d:   #e68a00;
+  --blue:    #0078d4;
+  --blue-l:  #e8f3fc;
+  --white:   #ffffff;
+  --off:     #f7f8fa;
+  --border:  rgba(0,0,0,0.07);
+  --text:    #0f1923;
+  --muted:   #5c6574;
+  --light:   #8a94a6;
+  --green:   #107c10;
+  --amber:   #ca5010;
+  --purple:  #5b21b6;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow:    0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
+  --radius:  10px;
+  --radius-lg: 16px;
+  --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-serif: 'DM Serif Display', Georgia, serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--off); color: var(--text); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--off); }
+::-webkit-scrollbar-thumb { background: #c8cdd6; border-radius: 3px; }
+
+/* TOPBAR */
+.sp-bar { background: var(--navy); display: flex; align-items: center; gap: 14px; padding: 0 28px; height: 50px; position: sticky; top: 0; z-index: 200; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.sp-logo { color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px; letter-spacing: 0.2px; }
+.logo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px; }
+.logo-grid span { background: rgba(255,255,255,0.9); border-radius: 1px; display: block; }
+.logo-grid span:nth-child(2), .logo-grid span:nth-child(3) { opacity: 0.65; }
+.sp-search { background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 7px 14px; color: #fff; font-family: var(--font); font-size: 13px; width: 260px; outline: none; }
+.sp-search::placeholder { color: rgba(255,255,255,0.45); }
+.sp-acts { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+.sp-btn { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 6px 16px; font-family: var(--font); font-size: 12px; font-weight: 500; cursor: pointer; }
+.sp-btn.pub { background: var(--aws); color: #1a1a1a; border-color: var(--aws); font-weight: 700; }
+
+/* NAV */
+.sp-nav { background: var(--navy2); display: flex; padding: 0 28px; border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 50px; z-index: 199; }
+.sp-ni { color: rgba(255,255,255,0.6); font-size: 12.5px; font-weight: 500; padding: 11px 18px; cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.2s; }
+.sp-ni:hover { color: rgba(255,255,255,0.9); }
+.sp-ni.act { color: #fff; border-bottom-color: var(--aws); }
+
+/* HERO */
+.hero { background: var(--navy); min-height: 360px; display: flex; align-items: flex-end; padding: 56px 64px 52px; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.09) 1px, transparent 1px); background-size: 32px 32px; pointer-events: none; }
+.hero::after { content: ''; position: absolute; top: -60px; right: -40px; width: 520px; height: 520px; background: radial-gradient(ellipse at 70% 40%, rgba(255,153,0,0.12) 0%, transparent 65%), radial-gradient(ellipse at 30% 70%, rgba(0,120,212,0.1) 0%, transparent 60%); pointer-events: none; }
+.hero-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(255,153,0,0.15); border: 1px solid rgba(255,153,0,0.35); color: var(--aws); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 5px 14px; border-radius: 100px; margin-bottom: 20px; }
+.hero-badge-dot { width: 6px; height: 6px; background: var(--aws); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity:1;transform:scale(1); } 50% { opacity:0.5;transform:scale(0.7); } }
+.hero-body { position: relative; z-index: 2; max-width: 680px; }
+.hero-h { font-family: var(--font-serif); font-size: 46px; font-weight: 400; color: #fff; line-height: 1.15; margin-bottom: 18px; letter-spacing: -0.5px; }
+.hero-h em { font-style: italic; color: var(--aws); }
+.hero-sub { font-size: 14.5px; color: rgba(255,255,255,0.6); line-height: 1.75; margin-bottom: 34px; max-width: 560px; font-weight: 400; }
+.hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+.h-btn { padding: 13px 28px; border-radius: 8px; font-family: var(--font); font-size: 13px; font-weight: 700; cursor: pointer; border: none; transition: transform 0.15s, opacity 0.15s; }
+.h-btn:hover { transform: translateY(-1px); opacity: 0.92; }
+.h-btn.p { background: var(--aws); color: #1a1a1a; }
+.h-btn.s { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+.hero-stats { position: absolute; right: 64px; bottom: 52px; z-index: 2; display: flex; gap: 40px; }
+.hero-stat-val { font-family: var(--font-serif); font-size: 34px; color: #fff; line-height: 1; margin-bottom: 4px; }
+.hero-stat-val span { color: var(--aws); }
+.hero-stat-lbl { font-size: 11px; color: rgba(255,255,255,0.45); letter-spacing: 0.5px; text-transform: uppercase; }
+.hero-stat-divider { width: 1px; background: rgba(255,255,255,0.1); align-self: stretch; }
+
+/* QUICK LINKS */
+.ql-bar { background: #fff; border-bottom: 1px solid var(--border); padding: 14px 64px; display: flex; gap: 8px; flex-wrap: wrap; box-shadow: var(--shadow-sm); }
+.ql { background: var(--off); color: var(--muted); border: 1px solid var(--border); border-radius: 100px; padding: 7px 18px; font-family: var(--font); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.ql:hover, .ql.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+/* MAIN */
+.cnt { max-width: 1240px; margin: 0 auto; padding: 52px 40px 80px; display: flex; flex-direction: column; gap: 52px; }
+.sec-eyebrow { font-size: 10px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+.sec-h { font-family: var(--font-serif); font-size: 28px; font-weight: 400; color: var(--text); margin-bottom: 4px; line-height: 1.3; }
+.sec-s { font-size: 13px; color: var(--muted); margin-bottom: 24px; max-width: 640px; }
+
+/* KPIs */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.kpi { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s, transform 0.2s; }
+.kpi:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.kpi::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--blue); }
+.kpi.ok::before { background: var(--green); }
+.kpi.warn::before { background: var(--amber); }
+.kpi.info::before { background: var(--purple); }
+.kpi-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.kpi-lbl { font-size: 11.5px; color: var(--muted); font-weight: 500; margin-bottom: 6px; }
+.kpi-val { font-family: var(--font-serif); font-size: 28px; color: var(--text); line-height: 1; margin-bottom: 6px; }
+.kpi-sub { font-size: 11.5px; color: var(--light); }
+.kpi-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 100px; margin-top: 10px; }
+.badge-ok  { background: #ecfaec; color: #0a5f0a; }
+.badge-warn{ background: #fef3e2; color: #92400e; }
+.badge-info{ background: #ede9fe; color: #4c1d95; }
+.badge-blue{ background: var(--blue-l); color: #0056a0; }
+
+/* CHARTS */
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.chart-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm); }
+.chart-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.chart-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.chart-sub { font-size: 12px; color: var(--muted); }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; }
+.legend span { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--muted); font-weight: 500; }
+.ld { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex-shrink: 0; }
+
+/* YEAR BREAKDOWN */
+.yr-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.yr-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s; }
+.yr-card:hover { box-shadow: var(--shadow); }
+.yr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.yr-num { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.yr-period { font-size: 11.5px; color: var(--light); margin-bottom: 16px; }
+.yr-avail { font-family: var(--font-serif); font-size: 24px; color: var(--text); }
+.yr-avail-lbl { font-size: 11px; color: var(--light); margin-bottom: 14px; }
+.bar-track { background: #eef0f4; border-radius: 6px; height: 7px; margin-bottom: 8px; overflow: hidden; }
+.bar-fill { height: 7px; border-radius: 6px; }
+.bar-stacked { display: flex; height: 7px; border-radius: 6px; overflow: hidden; }
+.bar-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+.yr-legend { display: flex; flex-direction: column; gap: 5px; }
+.yr-legend-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+.days-badge { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 100px; }
+
+/* PROJECT PIPELINE */
+.proj-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.proj-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.proj-hdr { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--off); }
+.proj-hdr-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.proj-count { font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 100px; }
+.proj-tbl { width: 100%; border-collapse: collapse; }
+.proj-tbl td { padding: 11px 22px; border-top: 1px solid #f2f3f5; color: var(--text); font-size: 12.5px; vertical-align: middle; }
+.proj-tbl td:last-child { text-align: right; font-weight: 700; color: var(--blue); white-space: nowrap; }
+.proj-tbl tr:hover td { background: #fafbfc; }
+.proj-num { font-size: 10px; color: var(--light); margin-right: 8px; }
+.proj-bu { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 100px; background: #eef3fc; color: #1e5fa8; margin-left: 6px; vertical-align: middle; }
+
+/* HOW-TO */
+.info-row { display: grid; grid-template-columns: 5fr 3fr; gap: 24px; }
+.prog-steps { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-sm); }
+.step { display: flex; gap: 18px; padding-bottom: 26px; position: relative; }
+.step:last-child { padding-bottom: 0; }
+.step:not(:last-child)::after { content: ''; position: absolute; left: 19px; top: 38px; bottom: 0; width: 1px; background: #e8ebf0; }
+.step-num { width: 38px; height: 38px; border-radius: 50%; background: var(--navy); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 1; }
+.step-title { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+.step-body { font-size: 12.5px; color: var(--muted); line-height: 1.65; }
+.qualifies { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.qual-hdr { background: var(--navy); padding: 16px 22px; }
+.qual-hdr-title { font-size: 13px; font-weight: 700; color: #fff; }
+.qual-hdr-sub { font-size: 11.5px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+.qual-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 22px; border-bottom: 1px solid #f2f3f5; transition: background 0.15s; }
+.qual-item:last-child { border-bottom: none; }
+.qual-item:hover { background: var(--off); }
+.qual-icon { width: 34px; height: 34px; border-radius: 8px; background: var(--blue-l); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.qual-title { font-size: 12.5px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.qual-body { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+/* FAQ */
+.faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.faq-item { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s; }
+.faq-item:hover { box-shadow: var(--shadow); }
+.faq-q { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; display: flex; gap: 10px; align-items: flex-start; }
+.faq-q-icon { width: 22px; height: 22px; background: var(--navy); color: #fff; border-radius: 6px; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.faq-a { font-size: 12.5px; color: var(--muted); line-height: 1.7; padding-left: 32px; }
+
+/* PEOPLE */
+.ppl-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.ppl-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s, transform 0.2s; }
+.ppl-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.avi { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.ppl-name { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.ppl-role { font-size: 12px; color: var(--muted); }
+.ppl-email { font-size: 12px; color: var(--blue); margin-top: 4px; }
+
+/* CTA */
+.cta-wrap { background: var(--navy); border-radius: var(--radius-lg); padding: 48px 56px; display: flex; align-items: center; justify-content: space-between; gap: 32px; position: relative; overflow: hidden; box-shadow: var(--shadow-lg); }
+.cta-wrap::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 28px 28px; pointer-events: none; }
+.cta-wrap::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 40%; background: radial-gradient(ellipse at 80% 50%, rgba(255,153,0,0.12) 0%, transparent 60%); pointer-events: none; }
+.cta-body { position: relative; z-index: 2; }
+.cta-eyebrow { font-size: 10px; font-weight: 700; color: var(--aws); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+.cta-h { font-family: var(--font-serif); font-size: 30px; font-weight: 400; color: #fff; line-height: 1.3; margin-bottom: 10px; }
+.cta-s { font-size: 13.5px; color: rgba(255,255,255,0.55); line-height: 1.65; }
+.cta-s strong { color: var(--aws); font-weight: 700; }
+.cta-actions { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 12px; align-items: flex-end; flex-shrink: 0; }
+.cta-btn { background: var(--aws); color: #1a1a1a; border: none; border-radius: 8px; padding: 14px 32px; font-family: var(--font); font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap; transition: background 0.2s, transform 0.15s; }
+.cta-btn:hover { background: var(--aws-d); transform: translateY(-1px); }
+.cta-btn-sec { background: transparent; color: rgba(255,255,255,0.7); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 10px 28px; font-family: var(--font); font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.cta-btn-sec:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+/* FOOTER */
+footer { background: var(--navy); padding: 28px 64px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid rgba(255,255,255,0.06); }
+.footer-logo { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.5); font-size: 12px; }
+.footer-note { font-size: 11.5px; color: rgba(255,255,255,0.35); text-align: center; line-height: 1.7; }
+.footer-links { display: flex; gap: 20px; }
+.footer-links a { font-size: 12px; color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
+.footer-links a:hover { color: rgba(255,255,255,0.8); }
+
+/* RESPONSIVE */
+@media (max-width: 1060px) {
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .yr-grid { grid-template-columns: 1fr 1fr; }
+  .hero-stats { display: none; }
+  .info-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .hero { padding: 40px 28px; }
+  .hero-h { font-size: 32px; }
+  .ql-bar { padding: 10px 24px; }
+  .cnt { padding: 36px 20px 60px; }
+  .charts-row, .proj-2col, .ppl-row, .faq-grid { grid-template-columns: 1fr; }
+  .cta-wrap { flex-direction: column; padding: 36px 28px; }
+  .cta-actions { align-items: flex-start; }
+  footer { flex-direction: column; text-align: center; padding: 24px; }
+  .footer-links { justify-content: center; }
+}
+@media (max-width: 480px) {
+  .kpi-row, .yr-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="sp-bar">
+  <div class="sp-logo">
+    <div class="logo-grid"><span></span><span></span><span></span><span></span></div>
+    SharePoint
+  </div>
+  <input class="sp-search" placeholder="Search this site…" />
+  <div class="sp-acts">
+    <button class="sp-btn">Share</button>
+    <button class="sp-btn pub">Republish</button>
+  </div>
+</div>
+
+<div class="sp-nav">
+  <div class="sp-ni act">Home</div>
+  <div class="sp-ni">Dashboard</div>
+  <div class="sp-ni">Projects</div>
+  <div class="sp-ni">Documents</div>
+  <div class="sp-ni">FAQ</div>
+  <div class="sp-ni">Contact</div>
+</div>
+
+<div class="hero">
+  <div class="hero-body">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      AWS Strategic Collaboration Agreement — Year 2 active
+    </div>
+    <div class="hero-h">AWS Sandbox<br><em>Innovation Credits</em></div>
+    <div class="hero-sub">TechCo's 5-year co-build, co-innovate &amp; co-market programme with AWS. We provide funding through AWS credits to teams building new products, features, and integrations on AWS services. Submit your project and help TechCo innovate faster.</div>
+    <div class="hero-btns">
+      <button class="h-btn p">Submit a Project</button>
+      <button class="h-btn s">View Project Pipeline</button>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-val">$1.8<span>M</span></div>
+      <div class="hero-stat-lbl">Total programme funds</div>
+    </div>
+    <div class="hero-stat-divider"></div>
+    <div>
+      <div class="hero-stat-val">15</div>
+      <div class="hero-stat-lbl">Projects tracked</div>
+    </div>
+    <div class="hero-stat-divider"></div>
+    <div>
+      <div class="hero-stat-val">63</div>
+      <div class="hero-stat-lbl">Days left in Year 2</div>
+    </div>
+  </div>
+</div>
+
+<div class="ql-bar">
+  <button class="ql active">Dashboard</button>
+  <button class="ql">Project Pipeline</button>
+  <button class="ql">AWS Calculator</button>
+  <button class="ql">Submit Project</button>
+  <button class="ql">Slack #aws-innovation-credits</button>
+  <button class="ql">Documents</button>
+</div>
+
+<div class="cnt">
+
+  <section>
+    <div class="sec-eyebrow">Live dashboard · Synced from Excel</div>
+    <div class="sec-h">Programme key metrics</div>
+    <div class="sec-s">Data sourced from Innovation_Credits_Breakdown.xlsx in the Documents library. Updates automatically when the file is modified.</div>
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-icon" style="background:#eef3fc">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" fill="#0078d4"/><rect x="11" y="2" width="7" height="7" rx="1.5" fill="#0078d4" opacity=".5"/><rect x="2" y="11" width="7" height="7" rx="1.5" fill="#0078d4" opacity=".5"/><rect x="11" y="11" width="7" height="7" rx="1.5" fill="#0078d4" opacity=".25"/></svg>
+        </div>
+        <div class="kpi-lbl">Total programme funds</div>
+        <div class="kpi-val">$1,800,000</div>
+        <div class="kpi-sub">Across 4 SCA years · Dec 2024–May 2028</div>
+        <span class="kpi-badge badge-blue">4-year SCA</span>
+      </div>
+      <div class="kpi ok">
+        <div class="kpi-icon" style="background:#ecfaec">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#107c10" stroke-width="1.8"/><path d="M6.5 10.5l2.5 2.5 4.5-5" stroke="#107c10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="kpi-lbl">Total consumed</div>
+        <div class="kpi-val">$324,156</div>
+        <div class="kpi-sub">18% of total · 7 funded projects</div>
+        <span class="kpi-badge badge-ok">On track</span>
+      </div>
+      <div class="kpi warn">
+        <div class="kpi-icon" style="background:#fef3e2">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#ca5010" stroke-width="1.8"/><line x1="10" y1="6" x2="10" y2="11" stroke="#ca5010" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14" r="1" fill="#ca5010"/></svg>
+        </div>
+        <div class="kpi-lbl">In progress / pending</div>
+        <div class="kpi-val">$555,441</div>
+        <div class="kpi-sub">7 projects awaiting approval &amp; funding</div>
+        <span class="kpi-badge badge-warn">Pending approval</span>
+      </div>
+      <div class="kpi info">
+        <div class="kpi-icon" style="background:#ede9fe">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#5b21b6" stroke-width="1.8"/><path d="M10 6v4m0 4h.01" stroke="#5b21b6" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="kpi-lbl">Remaining available</div>
+        <div class="kpi-val">$920,403</div>
+        <div class="kpi-sub">51% of total programme — open for submissions</div>
+        <span class="kpi-badge badge-info">51% available</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-title">Funds allocation breakdown</div>
+            <div class="chart-sub">Consumed vs in-progress vs remaining</div>
+          </div>
+          <div class="legend">
+            <span><span class="ld" style="background:#107c10"></span>Consumed 18%</span>
+            <span><span class="ld" style="background:#ca5010"></span>In progress 31%</span>
+            <span><span class="ld" style="background:#0078d4"></span>Remaining 51%</span>
+          </div>
+        </div>
+        <div style="position:relative;width:100%;height:240px"><canvas id="donutChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-title">SCA year utilisation</div>
+            <div class="chart-sub">Consumed, in-progress &amp; remaining per year</div>
+          </div>
+          <div class="legend">
+            <span><span class="ld" style="background:#107c10"></span>Consumed</span>
+            <span><span class="ld" style="background:#ca5010"></span>In progress</span>
+            <span><span class="ld" style="background:#dde1e8"></span>Remaining</span>
+          </div>
+        </div>
+        <div style="position:relative;width:100%;height:240px"><canvas id="barChart"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-eyebrow">SCA year breakdown</div>
+    <div class="sec-h">Funding by programme year</div>
+    <div class="yr-grid">
+      <div class="yr-card" style="border-top:3px solid #9ca3af">
+        <div class="yr-head"><span class="yr-num">Year 1</span><span class="days-badge" style="background:#f3f4f6;color:#6b7280">Expired</span></div>
+        <div class="yr-period">Dec 2024 – May 2025</div>
+        <div class="yr-avail">$400,000</div>
+        <div class="yr-avail-lbl">Total available</div>
+        <div class="bar-track"><div class="bar-fill" style="width:42.2%;background:#107c10"></div></div>
+        <div class="bar-meta"><span>$168,712 consumed</span><span>42.2%</span></div>
+        <div class="yr-legend">
+          <div class="yr-legend-row"><span class="ld" style="background:#107c10"></span>$168,712 consumed</div>
+          <div class="yr-legend-row"><span class="ld" style="background:#eef0f4"></span>$231,288 remaining</div>
+        </div>
+      </div>
+      <div class="yr-card" style="border-top:3px solid #ca5010">
+        <div class="yr-head"><span class="yr-num">Year 2</span><span class="days-badge" style="background:#fff4ce;color:#92400e">63 days left</span></div>
+        <div class="yr-period">Jun 2025 – May 2026</div>
+        <div class="yr-avail">$800,000</div>
+        <div class="yr-avail-lbl">Total available</div>
+        <div class="bar-track"><div class="bar-stacked"><div style="width:19.4%;background:#107c10"></div><div style="width:69.4%;background:#ca5010"></div></div></div>
+        <div class="bar-meta"><span>88.8% utilised</span><span>$89K left</span></div>
+        <div class="yr-legend">
+          <div class="yr-legend-row"><span class="ld" style="background:#107c10"></span>$155,444 consumed</div>
+          <div class="yr-legend-row"><span class="ld" style="background:#ca5010"></span>$555,441 in progress</div>
+        </div>
+      </div>
+      <div class="yr-card" style="border-top:3px solid #0078d4">
+        <div class="yr-head"><span class="yr-num">Year 3</span><span class="days-badge" style="background:#e8f3fc;color:#0056a0">428 days left</span></div>
+        <div class="yr-period">Jun 2026 – May 2027</div>
+        <div class="yr-avail">$500,000</div>
+        <div class="yr-avail-lbl">Total available</div>
+        <div class="bar-track"><div class="bar-fill" style="width:1%;background:#0078d4"></div></div>
+        <div class="bar-meta"><span>$0 consumed</span><span>0%</span></div>
+        <div class="yr-legend"><div class="yr-legend-row"><span class="ld" style="background:#0078d4"></span>Fully available — open for submissions</div></div>
+      </div>
+      <div class="yr-card" style="border-top:3px solid #5b21b6">
+        <div class="yr-head"><span class="yr-num">Year 4</span><span class="days-badge" style="background:#ede9fe;color:#4c1d95">794 days left</span></div>
+        <div class="yr-period">Jun 2027 – May 2028</div>
+        <div class="yr-avail">$100,000</div>
+        <div class="yr-avail-lbl">Total available</div>
+        <div class="bar-track"><div class="bar-fill" style="width:1%;background:#5b21b6"></div></div>
+        <div class="bar-meta"><span>$0 consumed</span><span>0%</span></div>
+        <div class="yr-legend"><div class="yr-legend-row"><span class="ld" style="background:#5b21b6"></span>Fully available — future planning</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-eyebrow">Project pipeline</div>
+    <div class="sec-h">15 total projects tracked</div>
+    <div class="sec-s">All submitted and managed through the AWS Innovation Credits programme</div>
+    <div class="proj-2col">
+      <div class="proj-card">
+        <div class="proj-hdr">
+          <span class="proj-hdr-title">Approved &amp; funded</span>
+          <span class="proj-count" style="background:#dff6dd;color:#0a5f0a">7 projects · $324,156</span>
+        </div>
+        <table class="proj-tbl">
+          <tbody>
+            <tr><td><span class="proj-num">01</span>AI Query Assistant</td><td>$100,000</td></tr>
+            <tr><td><span class="proj-num">02</span>Next-Gen Analytics Dashboard</td><td>$79,760</td></tr>
+            <tr><td><span class="proj-num">03</span>Platform AI Augmentation <span class="proj-bu">CTS</span></td><td>$51,000</td></tr>
+            <tr><td><span class="proj-num">04</span>Automated Resilience Testing <span class="proj-bu">CTS</span></td><td>$31,257</td></tr>
+            <tr><td><span class="proj-num">05</span>Intelligent Search Engine <span class="proj-bu">ABU</span></td><td>$24,186</td></tr>
+            <tr><td><span class="proj-num">06</span>Embedded AI Recommendations <span class="proj-bu">CTS</span></td><td>$20,241</td></tr>
+            <tr><td><span class="proj-num">07</span>Unified Monitoring Platform</td><td>$17,712</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="proj-card">
+        <div class="proj-hdr">
+          <span class="proj-hdr-title">In progress — pending funding</span>
+          <span class="proj-count" style="background:#fef3e2;color:#92400e">7 projects · $555,441</span>
+        </div>
+        <table class="proj-tbl">
+          <tbody>
+            <tr><td><span class="proj-num">01</span>Universal Data Semantic Layer <span class="proj-bu">CTS</span></td><td>$268,578</td></tr>
+            <tr><td><span class="proj-num">02</span>Multimodal Content Intelligence <span class="proj-bu">ABU</span></td><td>$90,756</td></tr>
+            <tr><td><span class="proj-num">03</span>Real-Time Lakehouse Streaming <span class="proj-bu">DBU</span></td><td>$68,181</td></tr>
+            <tr><td><span class="proj-num">04</span>ML Fairness &amp; Bias Detection <span class="proj-bu">ABU</span></td><td>$43,401</td></tr>
+            <tr><td><span class="proj-num">05</span>Data Pipeline Stitch Integration <span class="proj-bu">DBU</span></td><td>$45,000</td></tr>
+            <tr><td><span class="proj-num">06</span>Conversational AI Agent <span class="proj-bu">ABU</span></td><td>$28,200</td></tr>
+            <tr><td><span class="proj-num">07</span>Lakehouse Redshift Mirroring <span class="proj-bu">DBU</span></td><td>$11,325</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-eyebrow">How to participate</div>
+    <div class="sec-h">Four steps to get your project funded</div>
+    <div class="sec-s">Follow these steps to submit your team's innovation and claim AWS credits</div>
+    <div class="info-row">
+      <div class="prog-steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-title">Identify a qualifying project</div>
+            <div class="step-body">Any new product, feature, or integration that consumes or changes how TechCo or TechCo customers use AWS services — including platform development, AWS solution integrations, or upgrades to existing AWS-based features.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-title">Prepare your innovation plan</div>
+            <div class="step-body">Gather a project summary, architecture diagram, milestone &amp; deliverables timeline, and an AWS Simple Calculator estimate of your expected pre-production AWS spend during development and testing.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-title">Submit at least 14 days before project start</div>
+            <div class="step-body">No dollar threshold and no extra documentation required. Projects must be submitted at least 14 days before the start date, with a target GA date included — this helps TechCo internally prioritise submissions.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div>
+            <div class="step-title">Credits applied to TechCo R&amp;D account</div>
+            <div class="step-body">Once approved, AWS credits are applied to TechCo's pre-production R&amp;D AWS account — covering sandbox, dev, and test environments only. Production environment costs are excluded.</div>
+          </div>
+        </div>
+      </div>
+      <div class="qualifies">
+        <div class="qual-hdr">
+          <div class="qual-hdr-title">What qualifies?</div>
+          <div class="qual-hdr-sub">If it consumes AWS services, it likely qualifies</div>
+        </div>
+        <div class="qual-item">
+          <div class="qual-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1" fill="#0078d4"/><rect x="10" y="2" width="6" height="6" rx="1" fill="#0078d4" opacity=".5"/><rect x="2" y="10" width="6" height="6" rx="1" fill="#0078d4" opacity=".5"/><rect x="10" y="10" width="6" height="6" rx="1" fill="#0078d4" opacity=".25"/></svg></div>
+          <div><div class="qual-title">Platform development</div><div class="qual-body">New TechCo platform capabilities built on AWS services.</div></div>
+        </div>
+        <div class="qual-item">
+          <div class="qual-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="#0078d4" stroke-width="1.8"/><path d="M5.5 9l2.5 2.5 5-5" stroke="#0078d4" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div><div class="qual-title">AWS solution integration</div><div class="qual-body">Joint solutions or new AWS-native connectors embedded in TechCo.</div></div>
+        </div>
+        <div class="qual-item">
+          <div class="qual-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2l2.2 4.5H16l-3.6 2.8 1.4 4.7L9 11.5l-4.8 2.5 1.4-4.7L2 6.5h4.8z" stroke="#0078d4" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+          <div><div class="qual-title">Upgrades &amp; improvements</div><div class="qual-body">Improving existing AWS-based features or testing new services pre-GA.</div></div>
+        </div>
+        <div class="qual-item">
+          <div class="qual-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="7" width="12" height="8" rx="1.5" stroke="#0078d4" stroke-width="1.8"/><path d="M6 7V5.5a3 3 0 016 0V7" stroke="#0078d4" stroke-width="1.8"/></svg></div>
+          <div><div class="qual-title">AWS service testing</div><div class="qual-body">Pre-production testing and evaluation of new AWS service capabilities.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-eyebrow">FAQ</div>
+    <div class="sec-h">Frequently asked questions</div>
+    <div class="sec-s">From the official Sandbox Innovation Credit FAQ document</div>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <div class="faq-q"><span class="faq-q-icon">Q</span>Can the calculator include sandbox, dev, test, and prod costs?</div>
+        <div class="faq-a">Only pre-production costs (sandbox/dev/test). Credits apply to TechCo's R&amp;D AWS account — production environments are excluded.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span class="faq-q-icon">Q</span>Is there a threshold that triggers extra documentation?</div>
+        <div class="faq-a">No. There is no dollar threshold and no additional documentation required beyond the standard innovation plan.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span class="faq-q-icon">Q</span>Do projects need to be on the roadmap before submitting?</div>
+        <div class="faq-a">No — but they must be submitted at least 14 days before the project start date and include a target GA date in the plan.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span class="faq-q-icon">Q</span>Does AWS expect a specific ROI or spending ratio in return?</div>
+        <div class="faq-a">AWS is not tracking ROI as a ratio. They invest because new AWS-powered TechCo products drive long-term AWS consumption from TechCo customers.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span class="faq-q-icon">Q</span>What's the general rule for whether a project qualifies?</div>
+        <div class="faq-a">If the project will consume AWS services, or change how TechCo/customers consume AWS services, it should be considered for AWS Innovation Credits.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><span class="faq-q-icon">Q</span>Is there a set time horizon for when the project must reach GA?</div>
+        <div class="faq-a">No set horizon — but the plan should indicate the target GA date. This helps TechCo prioritise projects internally before submitting to AWS.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-eyebrow">Programme contacts</div>
+    <div class="sec-h">Meet the team</div>
+    <div class="sec-s">Reach out to discuss your project idea, get help with your submission, or join the Slack channel</div>
+    <div class="ppl-row">
+      <div class="ppl-card">
+        <div class="avi" style="background:#0b1529;outline:3px solid rgba(255,153,0,0.3);outline-offset:2px">AT</div>
+        <div>
+          <div class="ppl-name">Alex Turner</div>
+          <div class="ppl-role">Partner Solution Engineer</div>
+          <div class="ppl-email">alex.turner@techco.com</div>
+        </div>
+      </div>
+      <div class="ppl-card">
+        <div class="avi" style="background:#4c1d95;outline:3px solid rgba(91,33,182,0.25);outline-offset:2px">MS</div>
+        <div>
+          <div class="ppl-name">Maria Santos</div>
+          <div class="ppl-role">Sr. Project Manager</div>
+          <div class="ppl-email">maria.santos@techco.com</div>
+        </div>
+      </div>
+      <div class="ppl-card">
+        <div class="avi" style="background:#065f46;outline:3px solid rgba(16,124,16,0.25);outline-offset:2px">JP</div>
+        <div>
+          <div class="ppl-name">James Parker</div>
+          <div class="ppl-role">Technical Project Manager</div>
+          <div class="ppl-email">james.parker@techco.com</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-wrap">
+    <div class="cta-body">
+      <div class="cta-eyebrow">Ready to get started?</div>
+      <div class="cta-h">Submit your team's innovation project today</div>
+      <div class="cta-s">Talk to Alex, Maria, or James — or join <strong>#aws-innovation-credits</strong> on Slack.<br>Year 2 closes in just 63 days. Don't leave credits on the table.</div>
+    </div>
+    <div class="cta-actions">
+      <button class="cta-btn">Submit a Project</button>
+      <button class="cta-btn-sec">Join the Slack channel</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">
+    <div class="logo-grid" style="opacity:0.45"><span></span><span></span><span></span><span></span></div>
+    SharePoint · Internal Portal
+  </div>
+  <div class="footer-note">
+    Dashboard data from Innovation_Credits_Breakdown.xlsx in the Documents library<br>
+    For live auto-refresh: embed via File &amp; Media web part or connect via Power BI · Last updated March 2026
+  </div>
+  <div class="footer-links">
+    <a href="#">Documents</a>
+    <a href="#">Submit</a>
+    <a href="#">Slack</a>
+    <a href="#">Support</a>
+  </div>
+</footer>
+
+<script>
+  Chart.defaults.font.family = "'Plus Jakarta Sans', system-ui, sans-serif";
+  Chart.defaults.font.size = 12;
+
+  new Chart(document.getElementById('donutChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Consumed', 'In Progress', 'Remaining'],
+      datasets: [{ data: [324156, 555441, 920403], backgroundColor: ['#107c10','#ca5010','#0078d4'], borderWidth: 4, borderColor: '#ffffff' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '65%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: '#0b1529', titleFont: { weight: '700', size: 13 }, bodyFont: { size: 12 }, padding: 12, cornerRadius: 8, callbacks: { label: c => '  $' + c.parsed.toLocaleString() } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Year 1\n($400K)', 'Year 2\n($800K)', 'Year 3\n($500K)', 'Year 4\n($100K)'],
+      datasets: [
+        { label: 'Consumed',    data: [168712,155444,0,0],         backgroundColor: '#107c10', borderRadius: 4 },
+        { label: 'In Progress', data: [0,555441,0,0],              backgroundColor: '#ca5010', borderRadius: 4 },
+        { label: 'Remaining',   data: [231288,89115,500000,100000], backgroundColor: '#dde1e8', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: '#0b1529', titleFont: { weight: '700', size: 13 }, bodyFont: { size: 12 }, padding: 12, cornerRadius: 8, callbacks: { label: c => '  ' + c.dataset.label + ': $' + Math.round(c.parsed.y).toLocaleString() } }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, border: { display: false }, ticks: { color: '#8a94a6', font: { size: 11 }, autoSkip: false } },
+        y: { stacked: true, grid: { color: 'rgba(0,0,0,0.05)' }, border: { display: false }, ticks: { color: '#8a94a6', font: { size: 11 }, callback: v => '$' + Math.round(v/1000) + 'K' } }
+      }
+    }
+  });
+</script>
+</body>
+</html>
